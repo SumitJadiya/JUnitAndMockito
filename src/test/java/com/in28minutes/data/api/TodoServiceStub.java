@@ -11,4 +11,6 @@ public class TodoServiceStub implements TodoService {
 		return Arrays.asList("Learn Spring", "Learn JPA", "Learn Spring Boot");
 	}
 
+	public void deleteTodo(String todo) {
+	}
 }

@@ -4,7 +4,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -53,5 +58,26 @@ public class TodoBusinessImplMockTest {
 
 		// Then
 		assertThat(filteredTodos.size(), is(2));
+	}
+
+	@Test
+	public void testDeleteTodosNotRelatedToSpring_usingBDD() {
+
+		// Given
+		TodoService serviceMock = mock(TodoService.class);
+		given(serviceMock.retrieveTodos("Dummy"))
+				.willReturn(Arrays.asList("Learn Spring", "Learn JPA", "Learn Spring Boot"));
+
+		TodoBusinessImpl businessImpl = new TodoBusinessImpl(serviceMock);
+
+		// When
+		businessImpl.deleteTodosNotRelatedToSpring("Dummy");
+
+		// Then
+		// Verify helps in checking that a some method is triggered
+		verify(serviceMock, times(1)).deleteTodo("Learn JPA");		
+		verify(serviceMock, atLeast(1)).deleteTodo("Learn JPA");		
+		verify(serviceMock, never()).deleteTodo("Learn Spring");
+		verify(serviceMock, never()).deleteTodo("Learn Spring Boot");
 	}
 }
