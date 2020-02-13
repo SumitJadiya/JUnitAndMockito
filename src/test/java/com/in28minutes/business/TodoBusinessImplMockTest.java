@@ -4,8 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.in28minutes.data.api.TodoService;
 
@@ -75,9 +76,36 @@ public class TodoBusinessImplMockTest {
 
 		// Then
 		// Verify helps in checking that a some method is triggered
-		verify(serviceMock, times(1)).deleteTodo("Learn JPA");		
-		verify(serviceMock, atLeast(1)).deleteTodo("Learn JPA");		
+		verify(serviceMock, times(1)).deleteTodo("Learn JPA");
+		verify(serviceMock, atLeast(1)).deleteTodo("Learn JPA");
 		verify(serviceMock, never()).deleteTodo("Learn Spring");
 		verify(serviceMock, never()).deleteTodo("Learn Spring Boot");
+	}
+
+	@Test
+	public void testDeleteTodosNotRelatedToSpring_usingBDD_argumentCapture() {
+
+		// Declare Argument Capture
+		ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
+
+		// Given
+		TodoService serviceMock = mock(TodoService.class);
+		given(serviceMock.retrieveTodos("Dummy"))
+				.willReturn(Arrays.asList("Learn Spring", "Learn JPA", "Learn Spring Boot"));
+
+		TodoBusinessImpl businessImpl = new TodoBusinessImpl(serviceMock);
+
+		// When
+		businessImpl.deleteTodosNotRelatedToSpring("Dummy");
+
+		// Then
+		then(serviceMock).should().deleteTodo("Learn JPA");
+		
+		// Capture Argument
+		then(serviceMock).should().deleteTodo(argumentCaptor.capture());
+		assertThat(argumentCaptor.getValue(), is("Learn JPA"));
+		
+		then(serviceMock).should().deleteTodo(argumentCaptor.capture());
+		assertThat(argumentCaptor.getAllValues().size(), is(2));
 	}
 }
