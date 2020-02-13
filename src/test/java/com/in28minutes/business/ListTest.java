@@ -1,6 +1,10 @@
 package com.in28minutes.business;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -34,7 +38,7 @@ public class ListTest {
 		List listMock = mock(List.class);
 		when(listMock.get(0)).thenReturn("STJ");
 		assertEquals("STJ", listMock.get(0));
-		assertEquals(null, listMock.get(1));
+		assertNull(null, listMock.get(1));
 	}
 
 	@Test
@@ -53,6 +57,27 @@ public class ListTest {
 		// Throwing Exceptions
 		when(listMock.get(anyInt())).thenThrow(new RuntimeException("Some Exception"));
 		listMock.get(0);
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void letsMockListGet_testMixed() {
+		List listMock = mock(List.class);
+
+		when(listMock.subList(anyInt(), 5)).thenThrow(new RuntimeException("Some Exception"));
+		listMock.get(0);
+	}
+
+	@Test
+	public void letsMockListGet_usingBDD() {
+		// Given
+		List listMock = mock(List.class);
+		given(listMock.get(anyInt())).willReturn("STJ");
+		
+		// When
+		String element = (String) listMock.get(0);
+
+		// Then 
+		assertThat(element, is("STJ"));
 	}
 
 }

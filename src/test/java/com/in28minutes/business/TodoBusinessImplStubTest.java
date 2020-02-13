@@ -18,5 +18,4 @@ public class TodoBusinessImplStubTest {
 		List<String> filteredTodos = businessImpl.retrieveTodosRelatedToSpring("Dummy");
 		assertEquals(2, filteredTodos.size());
 	}
-
 }
