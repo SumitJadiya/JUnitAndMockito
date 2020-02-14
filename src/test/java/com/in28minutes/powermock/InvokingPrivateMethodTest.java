@@ -11,13 +11,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(UtilityClass.class)
-public class MockingStaticMethodTest {
+public class InvokingPrivateMethodTest {
 
 	@Mock
 	Dependency dependency;
@@ -29,17 +27,10 @@ public class MockingStaticMethodTest {
 	ArgumentCaptor<String> argumentCaptor;
 
 	@Test
-	public void testRetrieveTodosRelatedToSpring_usingAMock() {
+	public void testRetrieveTodosRelatedToSpring_usingAMock() throws Exception {
 		when(dependency.retrieveAllStats()).thenReturn(Arrays.asList(1, 2, 3));
 
-		PowerMockito.mockStatic(UtilityClass.class);
-		when(UtilityClass.staticMethod(6)).thenReturn(150);
-
-		int result = systemUnderTest.methodCallingAStaticMethod();
-		assertEquals(150, result);
-		
-		// check if UtilityClass.staticMethod(6) was called
-		PowerMockito.verifyStatic();
-		UtilityClass.staticMethod(6);
+		long result = Whitebox.invokeMethod(systemUnderTest, "privateMethodUnderTest");
+		assertEquals(6, result);
 	}
 }
